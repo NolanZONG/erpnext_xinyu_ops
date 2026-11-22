@@ -109,7 +109,7 @@ docker build \
 We can specify the `FRAPPE_PATH` and `FRAPPE_BRANCH` build arguments if necessary.
 ## Export
 ```bash
-sudo docker save -o erpnext-xinyu.tar erpnext-xinyu:0.1
+docker save -o erpnext-xinyu.tar erpnext-xinyu:0.1
 ```
 ## Upload
 ```bash
@@ -117,7 +117,7 @@ rsync -avz --info=progress2 -e ssh erpnext-xinyu.tar developer@106.14.8.99:/opt/
 ```
 ## Import
 ```bash
-sudo docker load -i erpnext-xinyu.tar
+docker load -i erpnext-xinyu.tar
 ```
 
 # Start Services
