@@ -1,0 +1,6 @@
+# JetBrains IDEs
+.idea
+
+# VS Code
+.vscode/**
+!.vscode/extensions.json

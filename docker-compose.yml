@@ -1,0 +1,194 @@
+name: erpnext
+services:
+  backend:
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+        required: true
+    environment:
+      FORWARDED_ALLOW_IPS: 127.0.0.1,::1
+      GUNICORN_THREADS: "4"
+      GUNICORN_TIMEOUT: "120"
+      GUNICORN_WORKERS: "2"
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+    networks:
+      default: null
+    platform: linux/amd64
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: sites
+        target: /home/frappe/frappe-bench/sites
+        volume: {}
+  configurator:
+    command:
+      - |
+        ls -1 apps > sites/apps.txt; bench set-config -g db_host $$DB_HOST; bench set-config -gp db_port $$DB_PORT; bench set-config -g redis_cache "redis://$$REDIS_CACHE"; bench set-config -g redis_queue "redis://$$REDIS_QUEUE"; bench set-config -g redis_socketio "redis://$$REDIS_QUEUE"; bench set-config -gp socketio_port $$SOCKETIO_PORT; bench set-config -g chromium_path /usr/lib/chromium/chromium-headless-shell;
+    depends_on:
+      redis-cache:
+        condition: service_started
+        required: true
+      redis-queue:
+        condition: service_started
+        required: true
+    entrypoint:
+      - bash
+      - -c
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: "3306"
+      REDIS_CACHE: redis-cache:6379
+      REDIS_QUEUE: redis-queue:6379
+      SOCKETIO_PORT: "9000"
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+    networks:
+      default: null
+    platform: linux/amd64
+    pull_policy: always
+    restart: on-failure
+    volumes:
+      - type: volume
+        source: sites
+        target: /home/frappe/frappe-bench/sites
+        volume: {}
+  frontend:
+    command:
+      - nginx-entrypoint.sh
+    depends_on:
+      backend:
+        condition: service_started
+        required: true
+      websocket:
+        condition: service_started
+        required: true
+    environment:
+      BACKEND: backend:8000
+      CLIENT_MAX_BODY_SIZE: 50m
+      FRAPPE_SITE_NAME_HEADER: ${FRAPPE_SITE_NAME_HEADER}
+      NGINX_LISTEN_PORT: "8080"
+      PROXY_READ_TIMEOUT: "120"
+      SOCKETIO: websocket:9000
+      TRUST_UPSTREAM_FORWARDED_PROTO: "off"
+      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
+      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
+      UPSTREAM_REAL_IP_RECURSIVE: "off"
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+    networks:
+      default: null
+    platform: linux/amd64
+    ports:
+      - mode: ingress
+        target: 8080
+        published: ${HTTP_PUBLISH_PORT}
+        protocol: tcp
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: sites
+        target: /home/frappe/frappe-bench/sites
+        volume: {}
+  queue-long:
+    command:
+      - bench
+      - worker
+      - --queue
+      - long,default,short
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+        required: true
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+    networks:
+      default: null
+    platform: linux/amd64
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: sites
+        target: /home/frappe/frappe-bench/sites
+        volume: {}
+  queue-short:
+    command:
+      - bench
+      - worker
+      - --queue
+      - short,default
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+        required: true
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+    networks:
+      default: null
+    platform: linux/amd64
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: sites
+        target: /home/frappe/frappe-bench/sites
+        volume: {}
+  redis-cache:
+    image: redis:8.6-alpine
+    networks:
+      default: null
+    restart: unless-stopped
+  redis-queue:
+    image: redis:8.6-alpine
+    networks:
+      default: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: redis-queue-data
+        target: /data
+        volume: {}
+  scheduler:
+    command:
+      - bench
+      - schedule
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+        required: true
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+    networks:
+      default: null
+    platform: linux/amd64
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: sites
+        target: /home/frappe/frappe-bench/sites
+        volume: {}
+  websocket:
+    command:
+      - node
+      - /home/frappe/frappe-bench/apps/frappe/socketio.js
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+        required: true
+    image: ${CUSTOM_IMAGE}:${CUSTOM_TAG}
+    networks:
+      default: null
+    platform: linux/amd64
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: sites
+        target: /home/frappe/frappe-bench/sites
+        volume: {}
+networks:
+  default:
+    name: erpnext_default
+volumes:
+  redis-queue-data:
+    name: erpnext_redis-queue-data
+  sites:
+    name: erpnext_sites
