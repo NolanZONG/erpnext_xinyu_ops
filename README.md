@@ -98,6 +98,7 @@ innodb_snapshot_isolation = OFF
 ```
 # Build Docker Image
 
+## Build in Local
 ```bash
 docker build \
   --build-arg=FRAPPE_BRANCH=version-16 \
@@ -106,9 +107,20 @@ docker build \
   --tag=erpnext-xinyu:0.1 .
 ```
 We can specify the `FRAPPE_PATH` and `FRAPPE_BRANCH` build arguments if necessary.
+## Export
+```bash
+sudo docker save -o erpnext-xinyu.tar erpnext-xinyu:0.1
+```
+## Upload
+```bash
+rsync -avz --info=progress2 -e ssh erpnext-xinyu.tar developer@106.14.8.99:/opt/work/
+```
+## Import
+```bash
+sudo docker load -i erpnext-xinyu.tar
+```
 
 # Start Services
-
 ```bash
 docker compose up -d 
 ```
@@ -119,6 +131,7 @@ docker compose up -d
 docker compose exec backend \
   bench new-site erp \
   --mariadb-user-host-login-scope=% \
+  --db-root-username xinyu
   --db-root-password 'db password' \
   --admin-password 'admin password in UI' \
   --install-app erpnext \
