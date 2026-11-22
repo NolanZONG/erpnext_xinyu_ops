@@ -102,7 +102,7 @@ innodb_snapshot_isolation = OFF
 docker build \
   --build-arg=FRAPPE_BRANCH=version-16 \
   --secret=id=apps_json,src=./images/apps.json \
-  --file=images/Containerfile \ 
+  --file=./images/Containerfile \
   --tag=erpnext-xinyu:0.1 .
 ```
 We can specify the `FRAPPE_PATH` and `FRAPPE_BRANCH` build arguments if necessary.
