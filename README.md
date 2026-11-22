@@ -104,20 +104,20 @@ docker build \
   --build-arg=FRAPPE_BRANCH=version-16 \
   --secret=id=apps_json,src=./images/apps.json \
   --file=./images/Containerfile \
-  --tag=erpnext-xinyu:0.1 .
+  --tag=xinyu-erp:0.1 .
 ```
 We can specify the `FRAPPE_PATH` and `FRAPPE_BRANCH` build arguments if necessary.
 ## Export
 ```bash
-docker save -o erpnext-xinyu.tar erpnext-xinyu:0.1
+docker save -o xinyu-erp.tar xinyu-erp:0.1
 ```
 ## Upload
 ```bash
-rsync -avz --info=progress2 -e ssh erpnext-xinyu.tar developer@106.14.8.99:/opt/work/
+rsync -avz --info=progress2 -e ssh xinyu-erp.tar developer@106.14.8.99:/opt/work/
 ```
 ## Import
 ```bash
-docker load -i erpnext-xinyu.tar
+docker load -i xinyu-erp.tar
 ```
 
 # Start Services
