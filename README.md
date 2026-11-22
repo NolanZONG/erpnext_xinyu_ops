@@ -83,7 +83,19 @@ systemctl start mariadb
 confirm
 mariadb -e "SELECT @@datadir;"
 ```
-
+### Create a User for Xinyu
+```bash
+create user 'xinyu'@'%' identified by 'your password';
+grant all privileges on *.* to 'xinyu'@'%' with grant option;
+flush privileges;
+```
+### Custom Setting
+```bash
+bind-address            = 0.0.0.0
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+innodb_snapshot_isolation = OFF
+```
 # Build Docker Image
 
 ```bash
