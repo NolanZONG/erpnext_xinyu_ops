@@ -20,7 +20,7 @@ services:
     networks:
       default: null
     platform: linux/amd64
-    pull_policy: always
+    pull_policy: missing
     restart: unless-stopped
     volumes:
       - type: volume
@@ -52,7 +52,7 @@ services:
     networks:
       default: null
     platform: linux/amd64
-    pull_policy: always
+    pull_policy: missing
     restart: on-failure
     volumes:
       - type: volume
@@ -89,7 +89,7 @@ services:
         target: 8080
         published: ${HTTP_PUBLISH_PORT}
         protocol: tcp
-    pull_policy: always
+    pull_policy: missing
     restart: unless-stopped
     volumes:
       - type: volume
@@ -111,7 +111,7 @@ services:
     networks:
       default: null
     platform: linux/amd64
-    pull_policy: always
+    pull_policy: missing
     restart: unless-stopped
     volumes:
       - type: volume
@@ -133,7 +133,7 @@ services:
     networks:
       default: null
     platform: linux/amd64
-    pull_policy: always
+    pull_policy: missing
     restart: unless-stopped
     volumes:
       - type: volume
@@ -168,7 +168,7 @@ services:
     networks:
       default: null
     platform: linux/amd64
-    pull_policy: always
+    pull_policy: missing
     restart: unless-stopped
     volumes:
       - type: volume
@@ -187,7 +187,7 @@ services:
     networks:
       default: null
     platform: linux/amd64
-    pull_policy: always
+    pull_policy: missing
     restart: unless-stopped
     volumes:
       - type: volume
