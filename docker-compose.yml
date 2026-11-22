@@ -1,6 +1,12 @@
 name: erpnext
+
+x-host-gateway: &host-gateway
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
 services:
   backend:
+    <<: *host-gateway
     depends_on:
       configurator:
         condition: service_completed_successfully
@@ -22,6 +28,7 @@ services:
         target: /home/frappe/frappe-bench/sites
         volume: {}
   configurator:
+    <<: *host-gateway
     command:
       - |
         ls -1 apps > sites/apps.txt; bench set-config -g db_host $$DB_HOST; bench set-config -gp db_port $$DB_PORT; bench set-config -g redis_cache "redis://$$REDIS_CACHE"; bench set-config -g redis_queue "redis://$$REDIS_QUEUE"; bench set-config -g redis_socketio "redis://$$REDIS_QUEUE"; bench set-config -gp socketio_port $$SOCKETIO_PORT; bench set-config -g chromium_path /usr/lib/chromium/chromium-headless-shell;
@@ -90,6 +97,7 @@ services:
         target: /home/frappe/frappe-bench/sites
         volume: {}
   queue-long:
+    <<: *host-gateway
     command:
       - bench
       - worker
@@ -111,6 +119,7 @@ services:
         target: /home/frappe/frappe-bench/sites
         volume: {}
   queue-short:
+    <<: *host-gateway
     command:
       - bench
       - worker
@@ -147,6 +156,7 @@ services:
         target: /data
         volume: {}
   scheduler:
+    <<: *host-gateway
     command:
       - bench
       - schedule
