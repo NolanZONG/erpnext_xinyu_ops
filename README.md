@@ -131,6 +131,7 @@ docker compose exec backend mariadb -h host.docker.internal -u xinyu -p -e "sele
 ```
 
 # Create sites and install Apps
+## Create
 
 ```bash
 docker compose exec backend \
@@ -142,4 +143,9 @@ docker compose exec backend \
   --install-app erpnext \
   --install-app erpnext_china \
   --install-app erpnext_xinyu
+```
+## Init
+Access site from browser and init. After init completed, ensure the scheduler is enabled
+```bash
+docker compose exec backend bench --site erp scheduler status
 ```
