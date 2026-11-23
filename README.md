@@ -121,8 +121,13 @@ docker load -i xinyu-erp.tar
 ```
 
 # Start Services
+## Start
 ```bash
 docker compose up -d 
+```
+## Test DB Connection
+```bash
+docker compose exec backend mariadb -h host.docker.internal -u xinyu -p -e "select 1;"
 ```
 
 # Create sites and install Apps
@@ -131,7 +136,7 @@ docker compose up -d
 docker compose exec backend \
   bench new-site erp \
   --mariadb-user-host-login-scope=% \
-  --db-root-username xinyu
+  --db-root-username xinyu \
   --db-root-password 'db password' \
   --admin-password 'admin password in UI' \
   --install-app erpnext \
